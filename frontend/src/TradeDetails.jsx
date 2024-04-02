@@ -2,6 +2,7 @@ import { Button, Container, InputAdornment, InputLabel, MenuItem, Modal, Paper, 
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import API_URL from "./api.js"
+import { useNavigate } from 'react-router-dom';
 
 const style = {
     position: "absolute",
@@ -32,6 +33,8 @@ const TradeDetails = () => {
     // States for Update Modal Open and Track Id for Updating Trade
     const [isUpdateModal, setIsUpdateModal] = useState(0);
     const [tradeId, setTradeId] = useState(0)
+
+
 
 
     // Function for fetching all trades
@@ -104,6 +107,29 @@ const TradeDetails = () => {
 
     }
 
+    // Function for Single Trade Details
+    const getDataById = async (tradeId) => {
+
+        try {
+            const { data } = await axios.get(`${API_URL}/api/get-single-trade/${tradeId}`)
+            console.log(data);
+
+            setTradeDataTime(data?.tradeDataTime);
+            setStockName(data?.stockName)
+            setListingPrice(data?.listingPrice)
+            setQuantity(data?.quantity)
+            setType(data?.type)
+            setPricePerUnit(data?.pricePerUnit)
+
+
+
+        } catch (error) {
+            console.log(error);
+
+        }
+
+    }
+
 
     // Function for fetching the single trade details by using id for assigning data for Update Modal 
     const updateTradeDetails = (tradeId) => {
@@ -112,28 +138,7 @@ const TradeDetails = () => {
         setTradeId(tradeId)
         createTradeHandlerModalOpen(true)
 
-        const getDataById = async () => {
-
-            try {
-                const { data } = await axios.get(`${API_URL}/api/get-single-trade/${tradeId}`)
-                console.log(data);
-
-                setTradeDataTime(data?.tradeDataTime);
-                setStockName(data?.stockName)
-                setListingPrice(data?.listingPrice)
-                setQuantity(data?.quantity)
-                setType(data?.type)
-                setPricePerUnit(data?.pricePerUnit)
-
-
-
-            } catch (error) {
-                console.log(error);
-
-            }
-
-        }
-        getDataById()
+        getDataById(tradeId)
 
     }
 
@@ -145,21 +150,15 @@ const TradeDetails = () => {
             return;
         }
 
+        console.log(tradeDataTime, stockName, listingPrice, quantity, type, pricePerUnit);
+
         try {
-            const data = await axios.put(`${API_URL}/api/update-trade/${tradeId}`, {
-                tradeDataTime,
-                stockName,
-                listingPrice,
-                quantity,
-                type,
-                pricePerUnit
+            const { data } = await axios.put(`${API_URL}/api/update-trade/${tradeId}`, {
+                tradeDataTime, stockName, listingPrice, quantity, type, pricePerUnit
             })
             getAllTrades()
             createTradeHandlerModalClose()
             console.log(data);
-
-
-
         } catch (error) {
             console.log(error);
         }
@@ -181,6 +180,53 @@ const TradeDetails = () => {
             }
         }
     }
+
+    const navigate = useNavigate()
+
+    const createOrderHandler = (tradeId) => {
+
+
+
+        const createOrder = async () => {
+            try {
+                const { apidata } = await axios.get(`${API_URL}/api/get-single-trade/${tradeId}`)
+
+                try {
+                    let status = "created"
+                    const { data } = await axios.post(`${API_URL}/api/order/create-order`, {
+                        quantity: apidata?.quantity, pricePerUnit: apidata?.pricePerUnit, type: apidata?.type, stockName: apidata?.stockName, status: status
+                    })
+                    console.log(data);
+                    navigate("/orders")
+                } catch (error) {
+                    console.log(createOrder);
+                }
+
+
+
+            } catch (error) {
+                console.log(error);
+
+            }
+
+
+
+        }
+
+        if (window.confirm("Are you sure to create this order")) {
+
+            alert("Please wait 2 more seconds we preparing your orders and we redirected to Orders Page")
+
+            setTimeout(() => {
+
+                createOrder()
+            }, 2000)
+
+        }
+
+
+    }
+
 
 
     return (
@@ -285,7 +331,7 @@ const TradeDetails = () => {
                                             <TableCell align="center">{trade?.quantity}</TableCell>
                                             <TableCell align="center">{trade?.type}</TableCell>
                                             <TableCell align="center">{trade?.pricePerUnit}</TableCell>
-                                            <TableCell align='center'><Button variant="contained" color="success">Order</Button></TableCell>
+                                            <TableCell align='center'><Button variant="contained" color="success" onClick={() => createOrderHandler(trade?.id)}>Order</Button></TableCell>
                                             <TableCell align='center'><Button variant="contained" color="secondary" onClick={() => updateTradeDetails(trade?.id)}>Update</Button></TableCell>
                                             <TableCell align='center'><Button variant="contained" color="error" onClick={() => deleteTradeDetails(trade?.id)}>Delete</Button></TableCell>
 

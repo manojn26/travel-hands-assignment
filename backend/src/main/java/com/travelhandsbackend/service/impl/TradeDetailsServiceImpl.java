@@ -49,12 +49,12 @@ public class TradeDetailsServiceImpl implements TradeDetailsService {
                 () -> new ResourceNotFoundException("There is no data match with this Id")
         );
 
-        tradeDetails.setTradeDataTime(tradeDetails.getTradeDataTime());
-        tradeDetails.setStockName(tradeDetails.getStockName());
-        tradeDetails.setListingPrice(tradeDetails.getListingPrice());
-        tradeDetails.setQuantity(tradeDetails.getQuantity());
+        tradeDetails.setTradeDataTime(tradeDetailsDto.getTradeDataTime());
+        tradeDetails.setStockName(tradeDetailsDto.getStockName());
+        tradeDetails.setListingPrice(tradeDetailsDto.getListingPrice());
+        tradeDetails.setQuantity(tradeDetailsDto.getQuantity());
         tradeDetails.setType(tradeDetailsDto.getType());
-        tradeDetails.setPricePerUnit(tradeDetails.getPricePerUnit());
+        tradeDetails.setPricePerUnit(tradeDetailsDto.getPricePerUnit());
 
         TradeDetails updatedTradeDetails = tradeDetailsRepository.save(tradeDetails);
 
