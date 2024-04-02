@@ -1,0 +1,17 @@
+.trade-details-container {
+  width: 98vw;
+  height: 100vh;
+  border: 2px solid red;
+}
+.create-trade-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 5rem;
+  margin-right: 5rem;
+  margin-bottom: 2rem;
+}
+
+.close-button {
+  display: flex;
+  justify-content: flex-end;
+}
